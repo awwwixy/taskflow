@@ -1,0 +1,9 @@
+{
+    "name": "taskflow",
+    "version": "0.1.0",
+    "description": "A simple task management application",
+    "type": "module",
+    "author": "Viktoriia Slyviuk",
+    "license": "MIT"
+
+}
