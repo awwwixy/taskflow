@@ -38,5 +38,12 @@ export class PriorityQueue {
         if (index === -1) return undefined;
         return this.#items[index].item;
     }
+
+    dequeue(model = "highest") {
+        const index = this.#findIndex(model);
+        if (index === -1) return undefined;
+        const [removed] = this.#items.splice(index, 1);
+        return removed.item;
+    }
 }
       
