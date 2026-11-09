@@ -45,5 +45,10 @@ export class PriorityQueue {
         const [removed] = this.#items.splice(index, 1);
         return removed.item;
     }
+    toArray(model = "highest") {
+        const copy = [...this.#items];
+        copy.sort(comparators[model]);
+        return copy.map(( entry ) => entry.item);
+    }
 }
       
