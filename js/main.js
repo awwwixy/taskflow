@@ -15,7 +15,18 @@ function renderTasks() {
 
     for (const task of queue.toArray(sortMode)) {
         const li = document.createElement("li");
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = task.done;
+        checkbox.addEventListener("change", () => {
+            task.done = checkbox.checked;
+            renderTasks();
+        });
+
         li.textContent = `${task.title} (пріоритет: ${task.priority})`;
+        li.prepend(checkbox);
+        if (task.done) li.classList.add("done");
 
         const deleteButton = document.createElement("button");
         deleteButton.textContent = "Видалити";
