@@ -50,5 +50,13 @@ export class PriorityQueue {
         copy.sort(comparators[model]);
         return copy.map(( entry ) => entry.item);
     }
+
+    remove(predicate) {
+        const index = this.#items.findIndex((entry) => predicate(entry.item));
+        if (index === -1) return undefined;
+
+        const [removed] = this.#items.splice(index, 1);
+        return removed.item;
+    }
 }
       

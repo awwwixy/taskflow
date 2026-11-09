@@ -9,12 +9,21 @@ const sortSelect = document.getElementById("sort-mode");
 const queue = new PriorityQueue();
 let nextId = 1;
 let sortMode = "highest"; 
+
 function renderTasks() {
     list.innerHTML = "";
 
     for (const task of queue.toArray(sortMode)) {
         const li = document.createElement("li");
         li.textContent = `${task.title} (пріоритет: ${task.priority})`;
+
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Видалити";
+        deleteButton.addEventListener("click", () => {
+            queue.remove((t) => t.id === task.id);
+            renderTasks();
+        });
+        li.append(deleteButton);
         list.append(li);
     }
 }
