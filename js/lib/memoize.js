@@ -10,7 +10,6 @@ export function memoize(fn, options = {}) {
         } else if (policy === "lfu") {
             let minKey = null;
             let minHits = Infinity;
-
             for (const [key, entry] of cache) {
                 if (entry.hits < minHits) {
                     minHits = entry.hits;
@@ -20,6 +19,10 @@ export function memoize(fn, options = {}) {
 
             cache.delete(minKey);
 
+        } else if (typeof policy === "function") {
+            const entries = [...cache.entries()];
+            const keyToRemove = policy(entries);
+            cache.delete(keyToRemove);
         }
     }
 
