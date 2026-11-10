@@ -1,5 +1,6 @@
 import { PriorityQueue } from "./lib/priority-queue.js";
 import { EventEmitter } from "./lib/event-emitter.js";
+import { memoize } from "./lib/memoize.js";
  
 
 const form = document.getElementById("task-form");
@@ -7,20 +8,31 @@ const input = document.getElementById("task-title");
 const prioritySelect = document.getElementById("task-priority");
 const list = document.getElementById("task-list");
 const sortSelect = document.getElementById("sort-mode");
+const searchInput = document.getElementById("search");
 const statTotal = document.getElementById("stat-total");
 const statDone = document.getElementById("stat-done");
 const statProgress = document.getElementById("stat-progress");
 
 const queue = new PriorityQueue();
+const events = new EventEmitter();
 let nextId = 1;
 let sortMode = "highest"; 
+let version = 0;
 
-const events = new EventEmitter();
+function findTasks(query, mode, ver){
+    console.log("Шукаю:", query);
+    return queue.toArray(mode).filter((task) =>
+        task.title.toLowerCase().includes(query.toLowerCase())
+  );
+}
+
+const findTasksCache = memoize(findTasks, { maxSize: 20});
 
 function renderTasks() {
     list.innerHTML = "";
 
-    for (const task of queue.toArray(sortMode)) {
+    const query = searchInput.value.trim();
+    for (const task of findTasksCache(query, sortMode, version)){
         const li = document.createElement("li");
 
         const checkbox = document.createElement("input");
@@ -81,7 +93,11 @@ sortSelect.addEventListener("change", () => {
     renderTasks();
 });
 
+searchInput.addEventListener("input", renderTasks);
+
+events.on("changed", () => version++);
 events.on("changed", renderTasks);
 events.on("changed", renderStats);
+
 
 
