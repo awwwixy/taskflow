@@ -7,6 +7,9 @@ const input = document.getElementById("task-title");
 const prioritySelect = document.getElementById("task-priority");
 const list = document.getElementById("task-list");
 const sortSelect = document.getElementById("sort-mode");
+const statTotal = document.getElementById("stat-total");
+const statDone = document.getElementById("stat-done");
+const statProgress = document.getElementById("stat-progress");
 
 const queue = new PriorityQueue();
 let nextId = 1;
@@ -43,6 +46,17 @@ function renderTasks() {
     }
 }
 
+function renderStats() {
+  const tasks = queue.toArray();
+  const total = tasks.length;
+  const done = tasks.filter((task) => task.done).length;
+  const progress = total === 0 ? 0 : Math.round((done / total) * 100);
+
+  statTotal.textContent = total;
+  statDone.textContent = done;
+  statProgress.textContent = progress;
+}
+
 form.addEventListener("submit", (event) => {
     event.preventDefault();
     const title = input.value.trim();
@@ -68,5 +82,6 @@ sortSelect.addEventListener("change", () => {
 });
 
 events.on("changed", renderTasks);
+events.on("changed", renderStats);
 
 
