@@ -1,4 +1,6 @@
 import { PriorityQueue } from "./lib/priority-queue.js";
+import { EventEmitter } from "./lib/event-emitter.js";
+ 
 
 const form = document.getElementById("task-form");
 const input = document.getElementById("task-title");
@@ -9,6 +11,8 @@ const sortSelect = document.getElementById("sort-mode");
 const queue = new PriorityQueue();
 let nextId = 1;
 let sortMode = "highest"; 
+
+const events = new EventEmitter();
 
 function renderTasks() {
     list.innerHTML = "";
@@ -21,7 +25,7 @@ function renderTasks() {
         checkbox.checked = task.done;
         checkbox.addEventListener("change", () => {
             task.done = checkbox.checked;
-            renderTasks();
+            events.emit("changed");
         });
 
         li.textContent = `${task.title} (пріоритет: ${task.priority})`;
@@ -32,7 +36,7 @@ function renderTasks() {
         deleteButton.textContent = "Видалити";
         deleteButton.addEventListener("click", () => {
             queue.remove((t) => t.id === task.id);
-            renderTasks();
+            events.emit("changed");
         });
         li.append(deleteButton);
         list.append(li);
@@ -53,7 +57,7 @@ form.addEventListener("submit", (event) => {
     
     };
     queue.enqueue(task, priority);
-    renderTasks();
+    events.emit("changed");
 
     input.value = "";
 });
@@ -62,3 +66,7 @@ sortSelect.addEventListener("change", () => {
     sortMode = sortSelect.value;
     renderTasks();
 });
+
+events.on("changed", renderTasks);
+
+
