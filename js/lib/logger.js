@@ -1,5 +1,5 @@
 function defaultFormat(entry) {
-    return `[${entry.time}] [${entry.level}] ${entry.name} ${entry.message}: ${JSON.stringify(entry.data)}`;
+  return `[${entry.time}] [${entry.level}] ${entry.name} ${entry.message}: ${JSON.stringify(entry.data)}`;
 }
 
 export function withLog(fn, options = {}) {
@@ -7,13 +7,13 @@ export function withLog(fn, options = {}) {
   const format = options.format ?? defaultFormat;
   const output = options.output ?? console.log;
 
-  function write(lvl, message, data){
+  function write(lvl, message, data) {
     const entry = {
-        time: new Date().toISOString(),
-        level: lvl,
-        name: fn.name,
-        message,
-        data
+      time: new Date().toISOString(),
+      level: lvl,
+      name: fn.name,
+      message,
+      data,
     };
     output(format(entry));
   }
@@ -29,20 +29,21 @@ export function withLog(fn, options = {}) {
 
       if (result instanceof Promise) {
         return result
-        .then((value) => {
-          if (level !== "ERROR") write(level, `повернула за ${ms()} мс`, value);
-          return value;
-        })
-        .catch((error) => {
-          write("ERROR", "помилка", error.message);
-          throw error;
-        })
+          .then((value) => {
+            if (level !== "ERROR")
+              write(level, `повернула за ${ms()} мс`, value);
+            return value;
+          })
+          .catch((error) => {
+            write("ERROR", "помилка", error.message);
+            throw error;
+          });
       }
       if (level !== "ERROR") write(level, `повернула за ${ms()} мс`, result);
       return result;
-  } catch (error) {
-    write("ERROR", "помилка", error.message);
-    throw error;
-  }
-};
+    } catch (error) {
+      write("ERROR", "помилка", error.message);
+      throw error;
+    }
+  };
 }

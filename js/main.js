@@ -2,6 +2,7 @@ import { PriorityQueue } from "./lib/priority-queue.js";
 import { EventEmitter } from "./lib/event-emitter.js";
 import { memoize } from "./lib/memoize.js";
 import { roundRobin, consumeWithTimeout } from "./lib/generators.js";
+import { withLog } from "./lib/logger.js";
 
 const form = document.getElementById("task-form");
 const input = document.getElementById("task-title");
@@ -97,6 +98,7 @@ function addTask(title, priority) {
   queue.enqueue(task, priority);
   events.emit("changed");
 }
+const addTaskLogged = withLog(addTask, { level: "INFO"});
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -104,7 +106,7 @@ form.addEventListener("submit", (event) => {
   const priority = Number(prioritySelect.value);
   if (title === "") return;
 
-  addTask(title, priority);
+  addTaskLogged(title, priority);
   input.value = "";
 });
 
@@ -121,7 +123,7 @@ events.on("changed", renderStats);
 
 challengeBtn.addEventListener("click", () => {
   const title = challenges.next().value;
-  addTask(title, 3);
+  addTaskLogged(title, 3);
 });
 
 motivationBtn.addEventListener("click", async () => {
@@ -134,3 +136,5 @@ motivationBtn.addEventListener("click", async () => {
     motivationText.textContent = "";
     motivationBtn.disabled = false;
     });
+
+    
