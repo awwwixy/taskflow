@@ -1,7 +1,7 @@
 import { PriorityQueue } from "./lib/priority-queue.js";
 import { EventEmitter } from "./lib/event-emitter.js";
 import { memoize } from "./lib/memoize.js";
- 
+import { roundRobin, consumeWithTimeout } from "./lib/generators.js";
 
 const form = document.getElementById("task-form");
 const input = document.getElementById("task-title");
@@ -12,50 +12,58 @@ const searchInput = document.getElementById("search");
 const statTotal = document.getElementById("stat-total");
 const statDone = document.getElementById("stat-done");
 const statProgress = document.getElementById("stat-progress");
+const challengeBtn = document.getElementById("challenge-btn");
 
 const queue = new PriorityQueue();
 const events = new EventEmitter();
 let nextId = 1;
-let sortMode = "highest"; 
+let sortMode = "highest";
 let version = 0;
+const challenges = roundRobin([
+  "Випити дві склянки води",
+  "Прочитати 10 сторінок",
+  "Зробити 20 присідань",
+  "Прогулятися 15 хвилин",
+  "Прибрати робочий стіл",
+]);
 
-function findTasks(query, mode, ver){
-    console.log("Шукаю:", query);
-    return queue.toArray(mode).filter((task) =>
-        task.title.toLowerCase().includes(query.toLowerCase())
-  );
+function findTasks(query, mode, ver) {
+  console.log("Шукаю:", query);
+  return queue
+    .toArray(mode)
+    .filter((task) => task.title.toLowerCase().includes(query.toLowerCase()));
 }
 
-const findTasksCache = memoize(findTasks, { maxSize: 20});
+const findTasksCache = memoize(findTasks, { maxSize: 20 });
 
 function renderTasks() {
-    list.innerHTML = "";
+  list.innerHTML = "";
 
-    const query = searchInput.value.trim();
-    for (const task of findTasksCache(query, sortMode, version)){
-        const li = document.createElement("li");
+  const query = searchInput.value.trim();
+  for (const task of findTasksCache(query, sortMode, version)) {
+    const li = document.createElement("li");
 
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.checked = task.done;
-        checkbox.addEventListener("change", () => {
-            task.done = checkbox.checked;
-            events.emit("changed");
-        });
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = task.done;
+    checkbox.addEventListener("change", () => {
+      task.done = checkbox.checked;
+      events.emit("changed");
+    });
 
-        li.textContent = `${task.title} (пріоритет: ${task.priority})`;
-        li.prepend(checkbox);
-        if (task.done) li.classList.add("done");
+    li.textContent = `${task.title} (пріоритет: ${task.priority})`;
+    li.prepend(checkbox);
+    if (task.done) li.classList.add("done");
 
-        const deleteButton = document.createElement("button");
-        deleteButton.textContent = "Видалити";
-        deleteButton.addEventListener("click", () => {
-            queue.remove((t) => t.id === task.id);
-            events.emit("changed");
-        });
-        li.append(deleteButton);
-        list.append(li);
-    }
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Видалити";
+    deleteButton.addEventListener("click", () => {
+      queue.remove((t) => t.id === task.id);
+      events.emit("changed");
+    });
+    li.append(deleteButton);
+    list.append(li);
+  }
 }
 
 function renderStats() {
@@ -69,28 +77,30 @@ function renderStats() {
   statProgress.textContent = progress;
 }
 
+function addTask(title, priority) {
+  const task = {
+    id: nextId++,
+    title,
+    priority,
+    done: false,
+  };
+  queue.enqueue(task, priority);
+  events.emit("changed");
+}
+
 form.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const title = input.value.trim();
-    const priority = Number(prioritySelect.value);
-    if (title === "") return;
+  event.preventDefault();
+  const title = input.value.trim();
+  const priority = Number(prioritySelect.value);
+  if (title === "") return;
 
-    const task = { 
-        id: nextId++, 
-        title, 
-        priority,
-        done: false
-    
-    };
-    queue.enqueue(task, priority);
-    events.emit("changed");
-
-    input.value = "";
+  addTask(title, priority);
+  input.value = "";
 });
 
 sortSelect.addEventListener("change", () => {
-    sortMode = sortSelect.value;
-    renderTasks();
+  sortMode = sortSelect.value;
+  renderTasks();
 });
 
 searchInput.addEventListener("input", renderTasks);
@@ -99,5 +109,7 @@ events.on("changed", () => version++);
 events.on("changed", renderTasks);
 events.on("changed", renderStats);
 
-
-
+challengeBtn.addEventListener("click", () => {
+  const title = challenges.next().value;
+  addTask(title, 3);
+});
