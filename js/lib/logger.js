@@ -3,11 +3,20 @@ export function withLog(fn, options = {}) {
 
   return function (...args) {
     const time = new Date().toISOString();
-    console.log(`[${time}] [${level}] ${fn.name} викликано з`, args);
 
-    const result = fn(...args);
+    if (level !== "ERROR"){
+        console.log(`[${time}] [${level}] ${fn.name} викликано з`, args);
+    }
 
-    console.log(`[${time}] [${level}] ${fn.name} повернула`, result);
-    return result;
+    try {
+        const result = fn(...args);
+        if (level !== "ERROR"){
+            console.log(`[${time}] [${level}] ${fn.name} повернула`, result);
+        }
+        return result;
+    } catch (error){
+        console.error(`[${time}] [ERROR] ${fn.name} помилка:`, error.message);
+        throw error;
+    }
   };
 }
