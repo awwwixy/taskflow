@@ -3,6 +3,13 @@ import { EventEmitter } from "./lib/event-emitter.js";
 import { memoize } from "./lib/memoize.js";
 import { roundRobin, consumeWithTimeout } from "./lib/generators.js";
 import { withLog } from "./lib/logger.js";
+import { api } from "./lib/fake-api.js";
+import { createAuthProxy } from "./lib/auth-proxy.js";
+import {
+  apiKeyStrategy,
+  jwtStrategy,
+  oauthStrategy,
+} from "./lib/auth-strategies.js";
 
 const form = document.getElementById("task-form");
 const input = document.getElementById("task-title");
@@ -32,10 +39,10 @@ const challenges = roundRobin([
 ]);
 
 const quotes = roundRobin([
-    "Ти впораєшся!",
-    "Крок за кроком",
-    "Маленький прогрес - теж прогрес",
-    "Почни з найважливішого",
+  "Ти впораєшся!",
+  "Крок за кроком",
+  "Маленький прогрес - теж прогрес",
+  "Почни з найважливішого",
 ]);
 
 function findTasks(query, mode, ver) {
@@ -98,7 +105,7 @@ function addTask(title, priority) {
   queue.enqueue(task, priority);
   events.emit("changed");
 }
-const addTaskLogged = withLog(addTask, { level: "INFO"});
+const addTaskLogged = withLog(addTask, { level: "INFO" });
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -127,14 +134,31 @@ challengeBtn.addEventListener("click", () => {
 });
 
 motivationBtn.addEventListener("click", async () => {
-    motivationBtn.disabled = true;
+  motivationBtn.disabled = true;
 
-    await consumeWithTimeout(quotes, 5, (text) => {
-        motivationText.textContent = text;
-    }, 1000);
+  await consumeWithTimeout(
+    quotes,
+    5,
+    (text) => {
+      motivationText.textContent = text;
+    },
+    1000,
+  );
 
-    motivationText.textContent = "";
-    motivationBtn.disabled = false;
-    });
+  motivationText.textContent = "";
+  motivationBtn.disabled = false;
+});
 
-    
+const secureApi = createAuthProxy(api, apiKeyStrategy("secret-123"));
+
+async function testAuth() {
+  console.log("API Key:", (await secureApi.request("/tasks")).headers);
+
+  secureApi.setStrategy(jwtStrategy("jwt-token-abc"));
+  console.log("JWT:", (await secureApi.request("/tasks")).headers);
+
+  secureApi.setStrategy(oauthStrategy("oauth-token-xyz"));
+  console.log("OAuth:", (await secureApi.request("/tasks")).headers);
+}
+
+testAuth();
