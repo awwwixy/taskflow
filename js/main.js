@@ -149,7 +149,11 @@ motivationBtn.addEventListener("click", async () => {
   motivationBtn.disabled = false;
 });
 
-const secureApi = createAuthProxy(api, oauthStrategy("expired-token", "abc"));
+const secureApi = createAuthProxy(api, apiKeyStrategy("key"), { maxPerSecond: 2 });
 
-  secureApi.request("/tasks")
-  .then((response) => console.log("Відповідь:", response.headers));
+for (let i = 1; i <= 3; i++) {
+  secureApi
+    .request("/tasks")
+    .then(() => console.log(`Запит ${i}: OK`))
+    .catch((error) => console.log(`Запит ${i}:`, error.message));
+}
