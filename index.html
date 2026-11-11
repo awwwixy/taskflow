@@ -9,6 +9,7 @@
 <body>
     <header>
         <h1>Taskflow</h1>
+        <span id="user-name">Гість</span>
         <button id="login-btn">Увійти</button>
     </header>
 
@@ -45,6 +46,8 @@
                         <option value="newest">Спочатку нові</option>
             </select>
             <ul id="task-list"></ul>
+            <button type="button" id="sync-btn">Зберегти в хмару</button>
+            <p id="sync-status"></p>
         </section>
 
         <section id="import">

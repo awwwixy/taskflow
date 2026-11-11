@@ -5,11 +5,7 @@ import { roundRobin, consumeWithTimeout } from "./lib/generators.js";
 import { withLog } from "./lib/logger.js";
 import { api } from "./lib/fake-api.js";
 import { createAuthProxy } from "./lib/auth-proxy.js";
-import {
-  apiKeyStrategy,
-  jwtStrategy,
-  oauthStrategy,
-} from "./lib/auth-strategies.js";
+import {apiKeyStrategy, jwtStrategy, oauthStrategy, } from "./lib/auth-strategies.js";
 
 const form = document.getElementById("task-form");
 const input = document.getElementById("task-title");
@@ -23,6 +19,10 @@ const statProgress = document.getElementById("stat-progress");
 const challengeBtn = document.getElementById("challenge-btn");
 const motivationBtn = document.getElementById("motivation-btn");
 const motivationText = document.getElementById("motivation");
+const loginBtn = document.getElementById("login-btn");
+const userName = document.getElementById("user-name");
+const syncBtn = document.getElementById("sync-btn");
+const syncStatus = document.getElementById("sync-status");
 
 const queue = new PriorityQueue();
 const events = new EventEmitter();
@@ -149,11 +149,29 @@ motivationBtn.addEventListener("click", async () => {
   motivationBtn.disabled = false;
 });
 
-const secureApi = createAuthProxy(api, apiKeyStrategy("key"), { maxPerSecond: 2 });
+const guestStrategy = { name: "Guest", getHeaders: () => ({}) };
+const secureApi = createAuthProxy(api, guestStrategy, { maxPerSecond: 2 });
+let loggedIn = false;
 
-for (let i = 1; i <= 3; i++) {
-  secureApi
-    .request("/tasks")
-    .then(() => console.log(`Запит ${i}: OK`))
-    .catch((error) => console.log(`Запит ${i}:`, error.message));
-}
+loginBtn.addEventListener("click", () => {
+  loggedIn = !loggedIn;
+
+  if (loggedIn) {
+    secureApi.setStrategy(jwtStrategy("token-viktoriia"));
+    userName.textContent = "Вікторія";
+    loginBtn.textContent = "Вийти";
+  } else {
+    secureApi.setStrategy(guestStrategy);
+    userName.textContent = "Гість";
+    loginBtn.textContent = "Увійти";
+  }
+});
+
+syncBtn.addEventListener("click", async () => {
+  try {
+    await secureApi.request("/sync");
+    syncStatus.textContent = "Збережено✅";
+  } catch (error) {
+    syncStatus.textContent = error.message;
+  }
+});
