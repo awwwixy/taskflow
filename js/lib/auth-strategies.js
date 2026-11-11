@@ -12,9 +12,16 @@ export function jwtStrategy(token) {
     };
 }
 
-export function oauthStrategy(accessToken) {
+export function oauthStrategy(accessToken, refreshToken) {
+    let token = accessToken;
+
     return {
         name: "OAuth",
-        getHeaders: () => ({ Authorization: `Bearer ${accessToken}` })
+        getHeaders: () => ({ Authorization: `Bearer ${token}` }),
+        async refresh() {
+            await new Promise((resolve) => setTimeout(resolve, 200));
+            token = `new-token-${refreshToken}`;
+            console.log("Токен оновлено:", token);
+        }
     };
 }

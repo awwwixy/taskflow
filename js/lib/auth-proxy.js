@@ -12,10 +12,22 @@ export function createAuthProxy(target, initialStrategy) {
             const value = obj[prop];
             if (typeof value !== "function") return value;
 
-            return (endpoint, options = {}) => {
-                const headers = { ...options.headers, ...strategy.getHeaders() };
-                return value.call(obj, endpoint, { ...options, headers });
+            return async (endpoint, options = {}) => {
+                const send = () => value.call(obj, endpoint, {
+                    ...options,
+                    headers: { ...options.headers, ...strategy.getHeaders()}
+                });
+
+                 try {
+                    return await send();
+                 } catch (error) {
+                    if (error.message.startsWith("401") && strategy.refresh){
+                        await strategy.refresh();
+                        return send();
+                    }
+                    throw error;
+                 }
             };
         }
-    })
+    });
 }

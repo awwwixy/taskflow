@@ -149,16 +149,7 @@ motivationBtn.addEventListener("click", async () => {
   motivationBtn.disabled = false;
 });
 
-const secureApi = createAuthProxy(api, apiKeyStrategy("secret-123"));
+const secureApi = createAuthProxy(api, oauthStrategy("expired-token", "abc"));
 
-async function testAuth() {
-  console.log("API Key:", (await secureApi.request("/tasks")).headers);
-
-  secureApi.setStrategy(jwtStrategy("jwt-token-abc"));
-  console.log("JWT:", (await secureApi.request("/tasks")).headers);
-
-  secureApi.setStrategy(oauthStrategy("oauth-token-xyz"));
-  console.log("OAuth:", (await secureApi.request("/tasks")).headers);
-}
-
-testAuth();
+  secureApi.request("/tasks")
+  .then((response) => console.log("Відповідь:", response.headers));
