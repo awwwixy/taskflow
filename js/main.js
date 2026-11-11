@@ -13,18 +13,28 @@ const statTotal = document.getElementById("stat-total");
 const statDone = document.getElementById("stat-done");
 const statProgress = document.getElementById("stat-progress");
 const challengeBtn = document.getElementById("challenge-btn");
+const motivationBtn = document.getElementById("motivation-btn");
+const motivationText = document.getElementById("motivation");
 
 const queue = new PriorityQueue();
 const events = new EventEmitter();
 let nextId = 1;
 let sortMode = "highest";
 let version = 0;
+
 const challenges = roundRobin([
   "Випити дві склянки води",
   "Прочитати 10 сторінок",
   "Зробити 20 присідань",
   "Прогулятися 15 хвилин",
   "Прибрати робочий стіл",
+]);
+
+const quotes = roundRobin([
+    "Ти впораєшся!",
+    "Крок за кроком",
+    "Маленький прогрес - теж прогрес",
+    "Почни з найважливішого",
 ]);
 
 function findTasks(query, mode, ver) {
@@ -113,3 +123,14 @@ challengeBtn.addEventListener("click", () => {
   const title = challenges.next().value;
   addTask(title, 3);
 });
+
+motivationBtn.addEventListener("click", async () => {
+    motivationBtn.disabled = true;
+
+    await consumeWithTimeout(quotes, 5, (text) => {
+        motivationText.textContent = text;
+    }, 1000);
+
+    motivationText.textContent = "";
+    motivationBtn.disabled = false;
+    });
