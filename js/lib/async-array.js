@@ -1,37 +1,41 @@
 export function filterCallback(array, predicate, callback) {
-    const result = [];
-    let index = 0;
+  const result = [];
+  let index = 0;
 
-    function next() {
-        if (index >= array.length) {
-            callback(null,result);
-            return;
-        }
-
-        const item = array[index];
-        index++;
-
-        predicate(item, (error, keep) => {
-            if (error) {
-                callback(error);
-                return;
-            }
-            if (keep) result.push(item);
-            next();
-        });
+  function next() {
+    if (index >= array.length) {
+      callback(null, result);
+      return;
     }
 
-    next();
+    const item = array[index];
+    index++;
+
+    predicate(item, (error, keep) => {
+      if (error) {
+        callback(error);
+        return;
+      }
+      if (keep) result.push(item);
+      next();
+    });
+  }
+
+  next();
 }
 
-export async function filterAsync(array, predicate) {
-    const result = [];
+export async function filterAsync(array, predicate, options = {}) {
+  const result = [];
+  const signal = options.signal;
 
-    for (const item of array) {
-        if(await predicate(item)) {
-            result.push(item);
-        }
+  for (const item of array) {
+    if (signal?.aborted) {
+      throw new Error("Операцію скасовано");
     }
-    
-    return result;
+    if (await predicate(item)) {
+      result.push(item);
+    }
+  }
+
+  return result;
 }

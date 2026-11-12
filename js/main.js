@@ -183,11 +183,13 @@ function isEvenAsync(n) {
   });
 }
 
-filterAsync([1, 2, 3, 4], isEvenAsync)
-.then((result) => console.log("Через then:", result));
+const controller = new AbortController();
 
-async function demo() {
-  const result = await filterAsync([5, 6, 7, 8], isEvenAsync);
-  console.log("Через await:", result);
-}
-demo();
+filterAsync([1, 2, 3, 4, 5, 6], isEvenAsync, { signal: controller.signal })
+.then((result) => console.log("Результат:", result))
+.catch((error) => console.log("Помилка:", error.message));
+
+setTimeout(() => {
+  console.log("Натискаю «Скасувати»");
+  controller.abort();
+}, 700);
