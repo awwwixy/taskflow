@@ -186,13 +186,33 @@ syncBtn.addEventListener("click", async () => {
 importBtn.addEventListener("click", async () => {
   const total = 5000;
   let processed = 0;
+  let unfinished = 0;
 
-  for await(const batch of readArchive(total)) {
-    processed += batch.length;
-    importProgress.value = Math.round((processed / total) * 100);
-    importStatus.textContent = `Оброблено ${processed} з ${total}`;
+  importController = new AbortController();
+  importBtn.disabled = true;
+  cancelBtn.disabled = false;
+
+  try {
+    for await (const batch of readArchive(total)) {
+      const notDone = await filterAsync(batch, async (task) => !task.done, {
+        signal: importController.signal,
+      });
+
+      processed += batch.length;
+      unfinished += notDone.length;
+      importProgress.value = Math.round((processed / total) * 100);
+      importStatus.textContent = `Оброблено ${processed} з ${total}, невиконаних ${unfinished}`;
+    }
+
+    importStatus.textContent += " - готово ✅";
+  } catch (error) {
+    importStatus.textContent = `${error.message} на ${processed} записах`;
+  } finally {
+    importBtn.disabled = false;
+    cancelBtn.disabled = true;
   }
-
-  importStatus.textContent += " - готово ✅";
 });
 
+cancelBtn.addEventListener("click", () => {
+  importController.abort();
+});
