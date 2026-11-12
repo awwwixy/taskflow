@@ -1,3 +1,152 @@
+:root {
+    --bg: #f0fbfa;
+    --card: #ffffff;
+    --text: #22223b;
+    --muted: #8d8da6;
+    --accent: #0abab5;
+    --radius: 12px;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    background: var(--card);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+header h1 {
+    margin: 0 auto 0 0;
+    color: var(--accent);
+    font-size: 24px;
+}
+
+main {
+    max-width: 720px;
+    margin: 24px auto;
+    padding: 0 16px;
+}
+
+section {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+button,
+input,
+select {
+    font: inherit;
+    padding: 8px 12px;
+    border: 1px solid #dcdcec;
+    border-radius: 8px;
+    background: var(--card);
+}
+
+button {
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.1s;
+}
+
+button:hover {
+    border-color: var(--accent);
+}
+
+button[type="submit"] {
+    background: var(--accent);
+    color: white;
+    border: none;
+}
+
+button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+form,
+#tasks,
+#import {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+#task-title,
+#search {
+    flex: 1;
+}
+
+#stats {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+#task-list {
+    width: 100%;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#task-list li button {
+    margin-left: auto;
+}
+
+progress {
+    flex: 1;
+    accent-color: var(--accent);
+}
+
+#motivation,
+#sync-status,
+#import-status {
+    width: 100%;
+    margin: 4px 0 0;
+    color: var(--muted);
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#task-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    border-radius: 8px;
+    animation: appear 0.3s ease;
+    transition: background 0.2s;
+}
+
+#task-list li:hover {
+    background: var(--bg);
+}
+
+button:active {
+    transform: scale(0.96);
+}
+
 .done {
     text-decoration: line-through;
     color: gray;
