@@ -1,4 +1,5 @@
 import { filterCallback, filterAsync } from "./lib/async-array.js";
+import { readArchive } from "./lib/archive.js";
 
 function isEvenSlow(n, done) {
   setTimeout(() => done(null, n % 2 === 0), 300);
@@ -33,3 +34,15 @@ setTimeout(() => {
   console.log("Натискаю «Скасувати»");
   controller.abort();
 }, 700);
+
+async function demoArchive() {
+  let total = 0;
+  let done = 0;
+
+  for await (const batch of readArchive(1200)) {
+    total += batch.length;
+    done += batch.filter((task) => task.done).length;
+    console.log(`Оброблено ${total}, виконаних ${done}`);
+  }
+}
+demoArchive();
