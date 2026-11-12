@@ -5,7 +5,8 @@ import { roundRobin, consumeWithTimeout } from "./lib/generators.js";
 import { withLog } from "./lib/logger.js";
 import { api } from "./lib/fake-api.js";
 import { createAuthProxy } from "./lib/auth-proxy.js";
-import {apiKeyStrategy, jwtStrategy, oauthStrategy, } from "./lib/auth-strategies.js";
+import { jwtStrategy } from "./lib/auth-strategies.js";
+import { filterCallback, filterAsync } from "./lib/async-array.js";
 
 const form = document.getElementById("task-form");
 const input = document.getElementById("task-title");
@@ -175,3 +176,18 @@ syncBtn.addEventListener("click", async () => {
     syncStatus.textContent = error.message;
   }
 });
+
+function isEvenAsync(n) {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(n % 2 === 0), 300);
+  });
+}
+
+filterAsync([1, 2, 3, 4], isEvenAsync)
+.then((result) => console.log("Через then:", result));
+
+async function demo() {
+  const result = await filterAsync([5, 6, 7, 8], isEvenAsync);
+  console.log("Через await:", result);
+}
+demo();

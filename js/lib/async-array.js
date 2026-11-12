@@ -23,3 +23,15 @@ export function filterCallback(array, predicate, callback) {
 
     next();
 }
+
+export async function filterAsync(array, predicate) {
+    const result = [];
+
+    for (const item of array) {
+        if(await predicate(item)) {
+            result.push(item);
+        }
+    }
+    
+    return result;
+}
