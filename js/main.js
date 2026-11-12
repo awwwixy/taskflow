@@ -66,6 +66,7 @@ function renderTasks() {
   const query = searchInput.value.trim();
   for (const task of findTasksCache(query, sortMode, version)) {
     const li = document.createElement("li");
+    li.dataset.priority = task.priority;
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";

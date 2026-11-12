@@ -143,6 +143,18 @@ progress {
     background: var(--bg);
 }
 
+#task-list li[data-priority="1"]{
+    border-left: 4px solid #ef4444;
+}
+
+#task-list li[data-priority="2"] {
+    border-left: 4px solid #f59e0b;
+}
+
+#task-list li[data-priority="3"] {
+    border-left: 4px solid #22c55e;
+}
+
 button:active {
     transform: scale(0.96);
 }
