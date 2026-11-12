@@ -6,7 +6,6 @@ import { withLog } from "./lib/logger.js";
 import { api } from "./lib/fake-api.js";
 import { createAuthProxy } from "./lib/auth-proxy.js";
 import { jwtStrategy } from "./lib/auth-strategies.js";
-import { filterCallback, filterAsync } from "./lib/async-array.js";
 
 const form = document.getElementById("task-form");
 const input = document.getElementById("task-title");
@@ -177,19 +176,3 @@ syncBtn.addEventListener("click", async () => {
   }
 });
 
-function isEvenAsync(n) {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(n % 2 === 0), 300);
-  });
-}
-
-const controller = new AbortController();
-
-filterAsync([1, 2, 3, 4, 5, 6], isEvenAsync, { signal: controller.signal })
-.then((result) => console.log("Результат:", result))
-.catch((error) => console.log("Помилка:", error.message));
-
-setTimeout(() => {
-  console.log("Натискаю «Скасувати»");
-  controller.abort();
-}, 700);
