@@ -6,6 +6,8 @@ import { withLog } from "./lib/logger.js";
 import { api } from "./lib/fake-api.js";
 import { createAuthProxy } from "./lib/auth-proxy.js";
 import { jwtStrategy } from "./lib/auth-strategies.js";
+import { readArchive } from "./lib/archive.js";
+import { filterAsync } from "./lib/async-array.js";
 
 const form = document.getElementById("task-form");
 const input = document.getElementById("task-title");
@@ -23,6 +25,10 @@ const loginBtn = document.getElementById("login-btn");
 const userName = document.getElementById("user-name");
 const syncBtn = document.getElementById("sync-btn");
 const syncStatus = document.getElementById("sync-status");
+const importBtn = document.getElementById("import-btn");
+const cancelBtn = document.getElementById("cancel-btn");
+const importProgress = document.getElementById("import-progress");
+const importStatus = document.getElementById("import-status");
 
 const queue = new PriorityQueue();
 const events = new EventEmitter();
@@ -152,6 +158,7 @@ motivationBtn.addEventListener("click", async () => {
 const guestStrategy = { name: "Guest", getHeaders: () => ({}) };
 const secureApi = createAuthProxy(api, guestStrategy, { maxPerSecond: 2 });
 let loggedIn = false;
+let importController = null;
 
 loginBtn.addEventListener("click", () => {
   loggedIn = !loggedIn;
@@ -174,5 +181,18 @@ syncBtn.addEventListener("click", async () => {
   } catch (error) {
     syncStatus.textContent = error.message;
   }
+});
+
+importBtn.addEventListener("click", async () => {
+  const total = 5000;
+  let processed = 0;
+
+  for await(const batch of readArchive(total)) {
+    processed += batch.length;
+    importProgress.value = Math.round((processed / total) * 100);
+    importStatus.textContent = `Оброблено ${processed} з ${total}`;
+  }
+
+  importStatus.textContent += " - готово ✅";
 });
 
