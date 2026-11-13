@@ -1,6 +1,4 @@
-import { filterCallback, filterAsync } from "./lib/async-array.js";
-import { readArchive } from "./lib/archive.js";
-import { EventEmitter } from "./lib/event-emitter.js";
+import { filterCallback, filterAsync, readArchive, EventEmitter } from "taskflow-lib";
 
 function isEvenSlow(n, done) {
   setTimeout(() => done(null, n % 2 === 0), 300);
@@ -74,11 +72,16 @@ emitter.on("error", (error) => console.log("Канал error:", error.message));
 emitter.emit("ping");
 
 const cbController = new AbortController();
-filterCallback([1, 2, 3, 4, 5, 6], isEvenSlow, (error, result) => {
-  if (error) {
-    console.log("Callback abort:", error.name, error.message);
-    return;
-  }
-  console.log("Callback abort:", result);
-}, { signal: cbController.signal });
+filterCallback(
+  [1, 2, 3, 4, 5, 6],
+  isEvenSlow,
+  (error, result) => {
+    if (error) {
+      console.log("Callback abort:", error.name, error.message);
+      return;
+    }
+    console.log("Callback abort:", result);
+  },
+  { signal: cbController.signal },
+);
 setTimeout(() => cbController.abort(), 700);
