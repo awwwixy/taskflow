@@ -1,42 +1,27 @@
-export function createAuthProxy(target, initialStrategy, proxyOptions = {}) {
-    let strategy = initialStrategy;
-    const limit = proxyOptions.maxPerSecond ?? Infinity;
-    let calls = [];
+export class AuthProxy {
+  constructor(client, strategy) {
+    this.client = client;
+    this.strategy = strategy;
+  }
 
-    return new Proxy(target, {
-        get(obj, prop) {
-            if (prop === "setStrategy"){
-                return (newStrategy) => {
-                    strategy = newStrategy;
-                };
-            }
+  setStrategy(strategy) {
+    this.strategy = strategy;
+  }
 
-            const value = obj[prop];
-            if (typeof value !== "function") return value;
+  async request(req) {
+    const send = () =>
+      this.client.request({
+        ...req,
+        headers: { ...req.headers, ...this.strategy.getHeaders() },
+      });
 
-            return async (endpoint, options = {}) => {
-                const now = Date.now();
-                calls = calls.filter((time) => now - time < 1000);
-                if (calls.length >= limit) {
-                    throw new Error("429: забагато запитів");
-                }
-                calls.push(now);
+    let response = await send();
 
-                const send = () => value.call(obj, endpoint, {
-                    ...options,
-                    headers: { ...options.headers, ...strategy.getHeaders()}
-                });
+    if (response.status === 401 && this.strategy.refresh) {
+      await this.strategy.refresh();
+      response = await send();
+    }
 
-                 try {
-                    return await send();
-                 } catch (error) {
-                    if (error.message.startsWith("401") && strategy.refresh){
-                        await strategy.refresh();
-                        return send();
-                    }
-                    throw error;
-                 }
-            };
-        }
-    });
+    return response;
+  }
 }
