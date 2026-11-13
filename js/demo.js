@@ -1,5 +1,6 @@
 import { filterCallback, filterAsync } from "./lib/async-array.js";
 import { readArchive } from "./lib/archive.js";
+import { EventEmitter } from "./lib/event-emitter.js";
 
 function isEvenSlow(n, done) {
   setTimeout(() => done(null, n % 2 === 0), 300);
@@ -12,23 +13,24 @@ function isEvenAsync(n) {
 }
 
 filterCallback([1, 2, 3, 4, 5, 6], isEvenSlow, (error, result) => {
-    console.log("CallBack", result);
+  console.log("CallBack", result);
 });
 
-filterAsync([1, 2, 3, 4], isEvenAsync)
-.then((result) => console.log("Promise then:", result));
+filterAsync([1, 2, 3, 4], isEvenAsync).then((result) =>
+  console.log("Promise then:", result),
+);
 
 async function demoAwait() {
-    const result = await filterAsync([5, 6, 7, 8], isEvenAsync);
-    console.log("Promise await:", result);
+  const result = await filterAsync([5, 6, 7, 8], isEvenAsync);
+  console.log("Promise await:", result);
 }
 demoAwait();
 
 const controller = new AbortController();
 
 filterAsync([1, 2, 3, 4, 5, 6], isEvenAsync, { signal: controller.signal })
-.then((result) => console.log("Результат:", result))
-.catch((error) => console.log("Помилка:", error.message));
+  .then((result) => console.log("Результат:", result))
+  .catch((error) => console.log("Помилка:", error.message));
 
 setTimeout(() => {
   console.log("Натискаю «Скасувати»");
@@ -46,3 +48,11 @@ async function demoArchive() {
   }
 }
 demoArchive();
+
+const emitter = new EventEmitter();
+emitter.on("ping", () => {
+  throw new Error("Слухач 1 зламався");
+});
+emitter.on("ping", () => console.log("Слухач 2 працює"));
+emitter.on("error", (error) => console.log("Канал error:", error.message));
+emitter.emit("ping");
