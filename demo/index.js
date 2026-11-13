@@ -1,4 +1,18 @@
-import { filterCallback, filterAsync, readArchive, EventEmitter } from "taskflow-lib";
+import {
+  filterCallback,
+  filterAsync,
+  readArchive,
+  EventEmitter,
+  roundRobin,
+  consumeWithTimeout,
+  PriorityQueue,
+  mockFetch,
+  BaseClient,
+  AuthProxy,
+  LoggingProxy,
+  RateLimitProxy,
+  oauthStrategy,
+} from "taskflow-lib";
 
 function isEvenSlow(n, done) {
   setTimeout(() => done(null, n % 2 === 0), 300);
@@ -85,3 +99,19 @@ filterCallback(
   { signal: cbController.signal },
 );
 setTimeout(() => cbController.abort(), 700);
+
+const colors = roundRobin(["red", "green", "blue"]);
+console.log("Round robin:", colors.next().value, colors.next().value, colors.next().value, colors.next().value);
+consumeWithTimeout(roundRobin([1, 2, 3]), 1, (n) => console.log("Timeout consumer:", n), 300);
+
+const queue = new PriorityQueue();
+queue.enqueue("Низька", 3);
+queue.enqueue("Висока", 1);
+queue.enqueue("Середня", 2);
+console.log("Queue highest:", queue.peek("highest"), "| oldest:", queue.peek("oldest"));
+
+const client = new AuthProxy(
+  new LoggingProxy(new RateLimitProxy(new BaseClient(mockFetch), 2)),
+  oauthStrategy("expired-token", "refresh-123"),
+);
+client.request({ url: "/profile" }).then((response) => console.log("Proxy chain:", response.status));
