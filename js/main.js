@@ -195,7 +195,7 @@ loginBtn.addEventListener("click", () => {
 syncBtn.addEventListener("click", async () => {
   try {
     await syncService.save(queue.toArray());
-    syncStatus.textContent = "Збережено✅";
+    syncStatus.textContent = "Збережено ✅";
   } catch (error) {
     syncStatus.textContent = error.message;
   }

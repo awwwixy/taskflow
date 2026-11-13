@@ -1,7 +1,7 @@
 {
   "name": "taskflow-lib",
   "version": "1.0.0",
-  "description": "A simple task management application",
+  "description": "Utilities for TaskFlow: queue, memoization, events, auth proxy",
   "type": "module",
   "main": "index.js",
   "exports": "./index.js",
