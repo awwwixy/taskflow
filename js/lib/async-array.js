@@ -1,8 +1,14 @@
-export function filterCallback(array, predicate, callback) {
+export function filterCallback(array, predicate, callback, options = {}) {
   const result = [];
   let index = 0;
+  const signal = options.signal;
 
   function next() {
+    if (signal?.aborted) {
+      callback(new DOMException("Операцію скасовано", "AbortError"));
+      return;
+    }
+
     if (index >= array.length) {
       callback(null, result);
       return;
