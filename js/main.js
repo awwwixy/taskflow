@@ -172,16 +172,20 @@ let loggedIn = false;
 let importController = null;
 
 loginBtn.addEventListener("click", () => {
-  loggedIn = !loggedIn;
+  if (!loggedIn) {
+    const name = prompt("Як тебе звати?");
+    const token = prompt("Введи токен доступу");
+    if (!token) return;
 
-  if (loggedIn) {
-    authClient.setStrategy(jwtStrategy("token-viktoriia"));
-    userName.textContent = "Вікторія";
+    authClient.setStrategy(jwtStrategy(token));
+    userName.textContent = name || "Користувач";
     loginBtn.textContent = "Вийти";
+    loggedIn = true;
   } else {
     authClient.setStrategy(guestStrategy);
     userName.textContent = "Гість";
     loginBtn.textContent = "Увійти";
+    loggedIn = false;
   }
 });
 
