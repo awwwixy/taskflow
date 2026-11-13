@@ -1,17 +1,20 @@
-import { PriorityQueue } from "./lib/priority-queue.js";
-import { EventEmitter } from "./lib/event-emitter.js";
-import { memoize } from "./lib/memoize.js";
-import { roundRobin, consumeWithTimeout } from "./lib/generators.js";
-import { withLog } from "./lib/logger.js";
-import { jwtStrategy } from "./lib/auth-strategies.js";
-import { readArchive } from "./lib/archive.js";
-import { filterAsync } from "./lib/async-array.js";
-import { mockFetch } from "./lib/mock-server.js";
-import { BaseClient } from "./lib/base-client.js";
-import { AuthProxy } from "./lib/auth-proxy.js";
-import { LoggingProxy } from "./lib/logging-proxy.js";
-import { RateLimitProxy } from "./lib/rate-limit-proxy.js";
-import { SyncService } from "./lib/sync-service.js";
+import {
+  PriorityQueue,
+  EventEmitter,
+  memoize,
+  roundRobin,
+  consumeWithTimeout,
+  withLog,
+  jwtStrategy,
+  readArchive,
+  filterAsync,
+  mockFetch,
+  BaseClient,
+  AuthProxy,
+  LoggingProxy,
+  RateLimitProxy,
+  SyncService,
+} from "taskflow-lib";
 
 const form = document.getElementById("task-form");
 const input = document.getElementById("task-title");
@@ -231,4 +234,3 @@ importBtn.addEventListener("click", async () => {
 cancelBtn.addEventListener("click", () => {
   importController.abort();
 });
-
