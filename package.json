@@ -4,6 +4,8 @@
     "description": "A simple task management application",
     "type": "module",
     "author": "Viktoriia Slyviuk",
-    "license": "MIT"
-
+    "license": "MIT",
+    "dependencies": {
+        "taskflow-lib": "file:./lib"
+    }
 }
