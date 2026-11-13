@@ -30,7 +30,7 @@ export async function filterAsync(array, predicate, options = {}) {
 
   for (const item of array) {
     if (signal?.aborted) {
-      throw new Error("Операцію скасовано");
+      throw new DOMException("Операцію скасовано", "AbortError");
     }
     if (await predicate(item)) {
       result.push(item);
