@@ -1,10 +1,10 @@
 {
-    "name": "taskflow-lib",
-    "version": "1.0.0",
-    "description": "A simple task management application",
-    "type": "module",
-    "main": "index.js",
-    "exports": "./index.js",
-    "author": "Viktoriia Slyviuk",
-    "license": "MIT"
+  "name": "taskflow-lib",
+  "version": "1.0.0",
+  "description": "A simple task management application",
+  "type": "module",
+  "main": "index.js",
+  "exports": "./index.js",
+  "author": "Viktoriia Slyviuk",
+  "license": "MIT"
 }

@@ -1,71 +1,70 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>taskflow</title>
     <script type="importmap">
-        {
-            "imports": {
-                "taskflow-lib": "./node_modules/taskflow-lib/index.js"
-            }
+      {
+        "imports": {
+          "taskflow-lib": "./node_modules/taskflow-lib/index.js"
         }
+      }
     </script>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
     <header>
-        <h1>Taskflow</h1>
-        <span id="user-name">Гість</span>
-        <button id="login-btn">Увійти</button>
+      <h1>Taskflow</h1>
+      <span id="user-name">Гість</span>
+      <button id="login-btn">Увійти</button>
     </header>
 
     <main>
-        <section id="stats">
-            <p>Усього: <span id="stat-total">0</span></p>
-            <p>Виконано: <span id="stat-done">0</span></p>
-            <p>Прогрес: <span id="stat-progress">0</span>%</p>
-        </section>
+      <section id="stats">
+        <p>Усього: <span id="stat-total">0</span></p>
+        <p>Виконано: <span id="stat-done">0</span></p>
+        <p>Прогрес: <span id="stat-progress">0</span>%</p>
+      </section>
 
-        <section id="add-task">
-            <form id="task-form">
-                <input type="text" id="task-title" placeholder="Піти на тренування">
+      <section id="add-task">
+        <form id="task-form">
+          <input type="text" id="task-title" placeholder="Піти на тренування" />
 
-                <select id="task-priority">
-                    <option value="1">Високий пріоритет</option>
-                    <option value="2" selected>Середній пріоритет</option>
-                    <option value="3">Низький пріоритет</option>
-                </select>
+          <select id="task-priority">
+            <option value="1">Високий пріоритет</option>
+            <option value="2" selected>Середній пріоритет</option>
+            <option value="3">Низький пріоритет</option>
+          </select>
 
-                <button type="submit">Додати</button>
-                <button type="button" id="challenge-btn">Челендж дня</button>
-                <button type="button" id="motivation-btn">Мотивація</button>
-            </form>
-            <p id="motivation"></p>
-        </section>
+          <button type="submit">Додати</button>
+          <button type="button" id="challenge-btn">Челендж дня</button>
+          <button type="button" id="motivation-btn">Мотивація</button>
+        </form>
+        <p id="motivation"></p>
+      </section>
 
-        <section id="tasks">
-            <input type="search" id="search" placeholder="Пошук справ">
-            <select id="sort-mode">
-                <option value="highest" selected>Спочатку важливі</option>
-                <option value="lowest">Спочатку неважливі</option>
-                <option value="oldest">Спочатку старі</option>
-                        <option value="newest">Спочатку нові</option>
-            </select>
-            <ul id="task-list"></ul>
-            <button type="button" id="sync-btn">Зберегти в хмару</button>
-            <p id="sync-status"></p>
-        </section>
+      <section id="tasks">
+        <input type="search" id="search" placeholder="Пошук справ" />
+        <select id="sort-mode">
+          <option value="highest" selected>Спочатку важливі</option>
+          <option value="lowest">Спочатку неважливі</option>
+          <option value="oldest">Спочатку старі</option>
+          <option value="newest">Спочатку нові</option>
+        </select>
+        <ul id="task-list"></ul>
+        <button type="button" id="sync-btn">Зберегти в хмару</button>
+        <p id="sync-status"></p>
+      </section>
 
-        <section id="import">
-            <button type="button" id="import-btn">Імпорт архіву</button>
-            <button type="button" id="cancel-btn" disabled>Скасувати</button>
-            <progress id="import-progress" value="0" max="100"></progress>
-            <p id="import-status"></p>
-        </section>
+      <section id="import">
+        <button type="button" id="import-btn">Імпорт архіву</button>
+        <button type="button" id="cancel-btn" disabled>Скасувати</button>
+        <progress id="import-progress" value="0" max="100"></progress>
+        <p id="import-status"></p>
+      </section>
     </main>
 
     <script type="module" src="js/main.js"></script>
-    
-</body>
+  </body>
 </html>
