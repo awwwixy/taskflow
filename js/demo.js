@@ -12,6 +12,22 @@ function isEvenAsync(n) {
   });
 }
 
+function isEvenCancelable(n, signal) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      signal?.removeEventListener("abort", onAbort);
+      resolve(n % 2 === 0);
+    }, 300);
+
+    function onAbort() {
+      clearTimeout(timer);
+      reject(new DOMException("Операцію скасовано", "AbortError"));
+    }
+
+    signal?.addEventListener("abort", onAbort);
+  });
+}
+
 filterCallback([1, 2, 3, 4, 5, 6], isEvenSlow, (error, result) => {
   console.log("CallBack", result);
 });
@@ -28,7 +44,7 @@ demoAwait();
 
 const controller = new AbortController();
 
-filterAsync([1, 2, 3, 4, 5, 6], isEvenAsync, { signal: controller.signal })
+filterAsync([1, 2, 3, 4, 5, 6], isEvenCancelable, { signal: controller.signal })
   .then((result) => console.log("Результат:", result))
   .catch((error) => console.log("Помилка:", error.message));
 

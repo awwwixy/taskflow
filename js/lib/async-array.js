@@ -38,7 +38,7 @@ export async function filterAsync(array, predicate, options = {}) {
     if (signal?.aborted) {
       throw new DOMException("Операцію скасовано", "AbortError");
     }
-    if (await predicate(item)) {
+    if (await predicate(item, signal)) {
       result.push(item);
     }
   }
