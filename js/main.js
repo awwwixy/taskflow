@@ -3,11 +3,15 @@ import { EventEmitter } from "./lib/event-emitter.js";
 import { memoize } from "./lib/memoize.js";
 import { roundRobin, consumeWithTimeout } from "./lib/generators.js";
 import { withLog } from "./lib/logger.js";
-import { api } from "./lib/fake-api.js";
-import { createAuthProxy } from "./lib/auth-proxy.js";
 import { jwtStrategy } from "./lib/auth-strategies.js";
 import { readArchive } from "./lib/archive.js";
 import { filterAsync } from "./lib/async-array.js";
+import { mockFetch } from "./lib/mock-server.js";
+import { BaseClient } from "./lib/base-client.js";
+import { AuthProxy } from "./lib/auth-proxy.js";
+import { LoggingProxy } from "./lib/logging-proxy.js";
+import { RateLimitProxy } from "./lib/rate-limit-proxy.js";
+import { SyncService } from "./lib/sync-service.js";
 
 const form = document.getElementById("task-form");
 const input = document.getElementById("task-title");
@@ -159,7 +163,11 @@ motivationBtn.addEventListener("click", async () => {
 });
 
 const guestStrategy = { name: "Guest", getHeaders: () => ({}) };
-const secureApi = createAuthProxy(api, guestStrategy, { maxPerSecond: 2 });
+const authClient = new AuthProxy(
+  new LoggingProxy(new RateLimitProxy(new BaseClient(mockFetch), 2)),
+  guestStrategy,
+);
+const syncService = new SyncService(authClient);
 let loggedIn = false;
 let importController = null;
 
@@ -167,11 +175,11 @@ loginBtn.addEventListener("click", () => {
   loggedIn = !loggedIn;
 
   if (loggedIn) {
-    secureApi.setStrategy(jwtStrategy("token-viktoriia"));
+    authClient.setStrategy(jwtStrategy("token-viktoriia"));
     userName.textContent = "Вікторія";
     loginBtn.textContent = "Вийти";
   } else {
-    secureApi.setStrategy(guestStrategy);
+    authClient.setStrategy(guestStrategy);
     userName.textContent = "Гість";
     loginBtn.textContent = "Увійти";
   }
@@ -179,7 +187,7 @@ loginBtn.addEventListener("click", () => {
 
 syncBtn.addEventListener("click", async () => {
   try {
-    await secureApi.request("/sync");
+    await syncService.save(queue.toArray());
     syncStatus.textContent = "Збережено✅";
   } catch (error) {
     syncStatus.textContent = error.message;
