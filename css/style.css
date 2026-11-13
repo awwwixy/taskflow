@@ -143,7 +143,7 @@ progress {
     background: var(--bg);
 }
 
-#task-list li[data-priority="1"]{
+#task-list li[data-priority="1"] {
     border-left: 4px solid #ef4444;
 }
 
@@ -153,6 +153,10 @@ progress {
 
 #task-list li[data-priority="3"] {
     border-left: 4px solid #22c55e;
+}
+
+#task-list li.challenge {
+    border-left-color: var(--accent);
 }
 
 button:active {

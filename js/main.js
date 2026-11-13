@@ -37,7 +37,7 @@ let sortMode = "highest";
 let version = 0;
 
 const challenges = roundRobin([
-  "Випити дві склянки води",
+  "Випити 7 склянок води",
   "Прочитати 10 сторінок",
   "Зробити 20 присідань",
   "Прогулятися 15 хвилин",
@@ -67,6 +67,7 @@ function renderTasks() {
   for (const task of findTasksCache(query, sortMode, version)) {
     const li = document.createElement("li");
     li.dataset.priority = task.priority;
+    if (task.isChallenge) li.classList.add("challenge");
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
@@ -76,7 +77,7 @@ function renderTasks() {
       events.emit("changed");
     });
 
-    li.textContent = `${task.title} (пріоритет: ${task.priority})`;
+    li.textContent = task.title;
     li.prepend(checkbox);
     if (task.done) li.classList.add("done");
 
@@ -102,12 +103,13 @@ function renderStats() {
   statProgress.textContent = progress;
 }
 
-function addTask(title, priority) {
+function addTask(title, priority, isChallenge = false) {
   const task = {
     id: nextId++,
     title,
     priority,
     done: false,
+    isChallenge,
   };
   queue.enqueue(task, priority);
   events.emit("changed");
@@ -137,7 +139,7 @@ events.on("changed", renderStats);
 
 challengeBtn.addEventListener("click", () => {
   const title = challenges.next().value;
-  addTaskLogged(title, 3);
+  addTaskLogged(title, 3, true);
 });
 
 motivationBtn.addEventListener("click", async () => {
